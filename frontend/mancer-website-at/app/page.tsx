@@ -1,7 +1,37 @@
+'use client'
+
 import Image from "next/image"
 import { Check, Lock } from "lucide-react"
+import { useState } from "react"
 
 export default function Home() {
+  const [status, setStatus] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const form = e.currentTarget
+    const name  = (form.elements.namedItem('name')  as HTMLInputElement).value
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value
+    const job   = (form.elements.namedItem('job')   as HTMLInputElement).value
+
+    try {
+      const res = await fetch('http://localhost:5000/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, job }),
+      })
+      if (res.ok) {
+        setStatus('✅ You’re on the list!')
+        form.reset()
+      } else {
+        const data = await res.json()
+        setStatus(`❌ ${data.error || res.statusText}`)
+      }
+    } catch {
+      setStatus('❌ Network error')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#070b34] text-white">
       <div className="container mx-auto px-4 py-8">
@@ -161,12 +191,13 @@ export default function Home() {
         {/* Waitlist Form */}
         <section className="max-w-md mx-auto mb-24">
           <h2 className="text-3xl font-bold text-center mb-8">Join the Waitlist.</h2>
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block mb-1 text-sm">
                 Name <span className="text-xs text-gray-400">(Required)</span>
               </label>
               <input
+                name="name"
                 type="text"
                 id="name"
                 className="w-full p-3 bg-[#22357b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5765ff]"
@@ -178,6 +209,7 @@ export default function Home() {
                 Email Address <span className="text-xs text-gray-400">(Required)</span>
               </label>
               <input
+                name="email"
                 type="email"
                 id="email"
                 className="w-full p-3 bg-[#22357b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5765ff]"
@@ -189,6 +221,7 @@ export default function Home() {
                 Job <span className="text-xs text-gray-400">(Required)</span>
               </label>
               <input
+                name="job"
                 type="text"
                 id="job"
                 className="w-full p-3 bg-[#22357b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5765ff]"
@@ -214,12 +247,20 @@ export default function Home() {
               </div>
             </div>
           </form>
+          {status && (
+            <p className="mt-4 text-center font-medium">
+              {status}
+            </p>
+          )}
         </section>
 
         {/* Footer */}
         <footer className="text-center mb-8">
           <h3 className="text-2xl font-bold mb-4">Contact Us:</h3>
-          <a href="mailto:team@mancertech.com" className="text-[#ffffff] hover:text-[#5765ff] transition-colors">
+          <a
+            href="mailto:team@mancertech.com"
+            className="text-[#ffffff] hover:text-[#5765ff] transition-colors"
+          >
             team@mancertech.com
           </a>
         </footer>

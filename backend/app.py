@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
@@ -38,7 +39,13 @@ def add_to_waitlist():
 
     entry = WaitlistEntry(name=name, email=email, job=job)
     db.session.add(entry)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        # 409 Conflict is appropriate for “already exists”
+        return jsonify({'error': 'This email is already on the waitlist'}), 409
+
     return jsonify({'message': 'Added to waitlist'}), 201
 
 if __name__ == '__main__':
