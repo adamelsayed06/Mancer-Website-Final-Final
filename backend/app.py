@@ -24,9 +24,6 @@ class WaitlistEntry(db.Model):
     job      = db.Column(db.String(120), nullable=False)
 
 # Create tables on first request
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 # ─── Routes ────────────────────────────────────────────────────────────────────
 @app.route('/api/waitlist', methods=['POST'])
@@ -45,4 +42,8 @@ def add_to_waitlist():
     return jsonify({'message': 'Added to waitlist'}), 201
 
 if __name__ == '__main__':
+    # create tables before serving any requests
+    with app.app_context():
+        db.create_all()
+
     app.run(debug=True)
