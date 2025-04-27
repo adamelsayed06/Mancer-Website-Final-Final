@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Check, Lock } from "lucide-react"
 import { useState } from "react"
 
+
 export default function Home() {
   const [status, setStatus] = useState<string | null>(null)
 
@@ -15,7 +16,7 @@ export default function Home() {
     const job   = (form.elements.namedItem('job')   as HTMLInputElement).value
 
     try {
-      const res = await fetch('http://localhost:5000/api/waitlist', {
+      const res = await fetch(`${process.env.FLASK_API}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, job }),
