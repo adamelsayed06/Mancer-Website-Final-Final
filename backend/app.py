@@ -15,7 +15,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-CORS(app, origins="https://mancer-websitee.vercel.app/")  # allow your Next.js dev server (http://localhost:3000) to talk to us
+CORS(
+  app,
+  resources={r"/api/*": {"origins": [
+    "http://localhost:3000",  # dev
+    "https://mancer-websitee.vercel.app",  # prod
+    "https://mancer-websitee-f0bdc9zr6-adamelsayed06s-projects.vercel.app"  # preview
+  ]}}
+)
 
 # ─── Models ────────────────────────────────────────────────────────────────────
 class WaitlistEntry(db.Model):
