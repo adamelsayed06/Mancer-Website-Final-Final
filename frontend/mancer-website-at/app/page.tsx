@@ -16,7 +16,7 @@ export default function Home() {
     const job   = (form.elements.namedItem('job')   as HTMLInputElement).value
 
     try {
-      const res = await fetch(`${process.env.FLASK_API}`, {
+      const res = await fetch(`${process.env.FLASK_API}/api/waitlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, job }),
